@@ -261,13 +261,16 @@ const createSchema = {
   },
   image: {
     in: ['body'],
-    custom: {
-      options: (value) => {
-        if (!/\.(png|jpg|jpeg)$/.test(value)) {
-          throw new Error('Image must have a valid extension png, jpg, jpeg');
-        }
-        return true;
-      },
+    // custom: {
+    //   options: (value) => {
+    //     if (!/\.(png|jpg|jpeg)$/.test(value)) {
+    //       throw new Error('Image must have a valid extension png, jpg, jpeg');
+    //     }
+    //     return true;
+    //   },
+    // },
+    isURL: {
+      errorMessage: 'Invalid URL',
     },
     notEmpty: {
       errorMessage: 'image cannot be empty',

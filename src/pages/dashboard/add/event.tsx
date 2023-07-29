@@ -18,32 +18,152 @@ const Tags = [
   { id: 5, name: 'NextJs' },
 ];
 
+interface OnlineEventType {
+  isOnline: boolean;
+  location: string;
+}
+
+interface SocialType {
+  name: string;
+  link: string;
+}
+interface SpeakerType {
+  name: string;
+  profile: string;
+  designation: string;
+  socials: SocialType[];
+}
+
+interface SpeakerCount {
+  count: number;
+  speakers: SpeakerType[];
+}
+
+interface SponsorsType {
+  count: number;
+  sponsors: string[];
+}
+
 function AddEvent() {
   const formRef = useRef(null);
   const [selectedTags, setSelectedTags] = useState<TagType[]>([]);
-  const [isOnlineEvent, setIsOnlineEvent] = useState<boolean>(false);
+  const [isOnlineEvent, setIsOnlineEvent] = useState<OnlineEventType>({
+    isOnline: false,
+    location: '',
+  });
   const [isTicketRequires, setIsTicketRequires] = useState<boolean>(false);
   // const [sponsors, setSponsors] = useState<string[]>([])
-  const [speakerCount, setSpeakerCount] = useState<number>(0);
-  const [sponsorsCount, setSponsorsCount] = useState<number>(0);
+  const [speakerDetails, setSpeakerDetails] = useState<SpeakerCount>({
+    count: 0,
+    speakers: [
+      {
+        name: '',
+        profile: '',
+        designation: '',
+        socials: [{ name: '', link: '' }],
+      },
+    ],
+  });
+  const [sponsorsDetails, setSponsorsDetails] = useState<SponsorsType>({
+    count: 0,
+    sponsors: [],
+  });
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
-    // const formData = formRef.current;
+    if (formRef.current) {
+      const formData = new FormData(formRef?.current);
+      formData.append('address', JSON.stringify(isOnlineEvent));
+      formData.append('tags', JSON.stringify(selectedTags));
+      // console.log(selectedTags)
+      formData.append('speakers', JSON.stringify(speakerDetails.speakers));
+      // console.log(sponsorsDetails.sponsors)
+      formData.append('sponsors', JSON.stringify(sponsorsDetails.sponsors));
+      // const object={}
+      //       formData.forEach(function(value: any,key:string){
+      //   object[key]=value;
+      // })
+
+      // console.log("speakers: ",speakerDetails.speakers);
+      // console.log("sponsors: ",sponsorsDetails.sponsors);
+      // const res = await fetch('/api/event/addEvent', {
+      //   method: 'post',
+      //   headers: {
+      //     'Content-type': 'application/json',
+      //   },
+      //   body: JSON.stringify(object),
+      // }).then((r) => r.json());
+      // console.log(res);
+      //{ isOnline: Boolean, location: String }
+      //image:linkk
+      //date: date
+      //tags: string[]
+    }
   };
 
-  const handleSponsors = (type: string) => {
+  const handleSponsorsCount = (e: any, type: string) => {
+    e.preventDefault();
     if (type === 'add') {
-      setSponsorsCount(sponsorsCount + 1);
-      // setSponsors((prevSponsors)=>[...prevSponsors,name])
+      setSponsorsDetails((prevSponsor) => ({
+        ...prevSponsor,
+        count: prevSponsor.count + 1,
+      }));
+      // setSponsorsCount(sponsorsCount + 1);
+      //
     }
     if (type === 'remove') {
-      setSponsorsCount(sponsorsCount - 1);
-      // setSponsors((prevSponsors)=>{
+      // setSponsorsCount(sponsorsCount - 1);
+      // setSponsorsDetails((prevSponsors)=>{
       //   return prevSponsors.filter((sponsorName: string,currentIndex:number)=>index!==currentIndex)
-
       // })
     }
+  };
+  // const updatedSpeakers = [...speakerDetails.speakers];
+  //         updatedSpeakers[index].socials[socialIndex].name = e.target.value;
+  //         setSpeakerDetails((prevSpeakers) => ({
+  //           ...prevSpeakers,
+  //           speakers: updatedSpeakers,
+  //         }));
+  // const updatedSponsors = [...SponsorsDetails.sponsors];
+  // updatedSponsors[index]
+  const handleSponsorsAdd = (name: string) => {
+    setSponsorsDetails((prevSponsors) => {
+      const updatedSponsors = [...prevSponsors.sponsors, name];
+      return {
+        ...prevSponsors,
+        sponsors: updatedSponsors,
+      };
+    });
+
+    // setSponsorsDetails((prevSponsors)=>({
+    //   ...prevSponsors,
+    //  sponsors: [...prevSponsors.sponsors,name]
+    // }))
+  };
+  const handleSpeakerCount = (e: any, type: string) => {
+    e.preventDefault();
+    if (type === 'add') {
+      setSpeakerDetails((prevSpeakers) => ({
+        ...prevSpeakers,
+        count: prevSpeakers.count + 1,
+      }));
+      // setSponsorsCount(sponsorsCount + 1);
+      //
+    }
+    if (type === 'remove') {
+      // setSponsorsDetails((prevSponsor)=>({
+      //   ...prevSponsor,
+      //   count: prevSponsor.count + 1,
+      // }))
+      // setSponsorsCount(sponsorsCount + 1);
+      //
+    }
+  };
+  const handleOnlineEvent = (value: boolean) => {
+    setIsOnlineEvent((prevValue) => ({
+      ...prevValue,
+      isOnline: value,
+    }));
   };
   // inputs
   const inputs = [
@@ -57,7 +177,7 @@ function AddEvent() {
     {
       element: 'input',
       label: 'Organizer',
-      name: 'name',
+      name: 'organizer',
       type: 'text',
       placeholder: 'Event Name',
     },
@@ -247,10 +367,10 @@ function AddEvent() {
                 {input.element === 'switch' && input.label === 'online' && (
                   <div className="flex items-stretch">
                     <Switch
-                      checked={isOnlineEvent}
-                      onChange={setIsOnlineEvent}
+                      checked={isOnlineEvent.isOnline as boolean}
+                      onChange={(val) => handleOnlineEvent(val)}
                       className={`${
-                        isOnlineEvent ? 'bg-teal-900' : 'bg-teal-700'
+                        isOnlineEvent.isOnline ? 'bg-teal-900' : 'bg-teal-700'
                       }
           relative inline-flex h-[38px] w-[74px] shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2  focus-visible:ring-white focus-visible:ring-opacity-75`}
                     >
@@ -258,17 +378,26 @@ function AddEvent() {
                       <span
                         aria-hidden="true"
                         className={`${
-                          isOnlineEvent ? 'translate-x-9' : 'translate-x-0'
+                          isOnlineEvent.isOnline
+                            ? 'translate-x-9'
+                            : 'translate-x-0'
                         }
             pointer-events-none inline-block h-[34px] w-[34px] transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out`}
                       />
                     </Switch>
-                    {!isOnlineEvent && (
+                    {!isOnlineEvent.isOnline && (
                       <input
-                        type={input.type}
-                        id={input.name}
-                        name={input.name}
+                        type="location"
+                        id="location"
+                        name="location"
+                        style={{ color: 'black' }}
                         className="ml-2 mx-auto h-10 w-full max-w-full rounded-lg pl-5 outline outline-2 outline-offset-1 outline-blue-400 placeholder:font-sans placeholder:text-base placeholder:text-gray-500 focus:outline-4"
+                        onChange={(e) =>
+                          setIsOnlineEvent((prevValue) => ({
+                            ...prevValue,
+                            location: e.target.value,
+                          }))
+                        }
                         placeholder="location"
                         aria-label="location"
                         aria-describedby="location"
@@ -300,19 +429,19 @@ function AddEvent() {
                     <div className="flex items-stretch">
                       <Button
                         className="mt-6"
-                        onClick={() => setSpeakerCount(speakerCount + 1)}
+                        onClick={(e) => handleSpeakerCount(e, 'add')}
                       >
                         Add Speakers
                       </Button>{' '}
                       <Button
                         className="mt-6"
-                        onClick={() => setSpeakerCount(speakerCount - 1)}
+                        // onClick={() => setSpeakerCount(speakerCount - 1)}
                       >
                         Delete Speakers
                       </Button>
                     </div>
 
-                    {Array.from({ length: speakerCount }).map(
+                    {Array.from({ length: speakerDetails.count as number }).map(
                       (_, index: number) => (
                         <div key={index}>
                           <>Speaker {index + 1}</>
@@ -321,15 +450,28 @@ function AddEvent() {
                             id="speaker-name"
                             name="speaker-name"
                             className="mr-2 mx-auto h-10 w-full max-w-full rounded-lg pl-5 outline outline-2 outline-offset-1 outline-blue-400 placeholder:font-sans placeholder:text-base placeholder:text-gray-500 focus:outline-4"
+                            // onBlur={(e) =>
+                            // }
                             placeholder="Speaker-Name"
                             aria-label="Speaker-Name"
                             aria-describedby="Speaker-Name"
                           />
+
                           <input
                             type="text"
                             id="speaker-profile"
                             name="speaker-profile"
                             className="mr-2 mx-auto h-10 w-full max-w-full rounded-lg pl-5 outline outline-2 outline-offset-1 outline-blue-400 placeholder:font-sans placeholder:text-base placeholder:text-gray-500 focus:outline-4"
+                            onBlur={(e) => {
+                              const updatedSpeakers = [
+                                ...speakerDetails.speakers,
+                              ];
+                              updatedSpeakers[index].profile = e.target.value;
+                              setSpeakerDetails((prevSpeakers) => ({
+                                ...prevSpeakers,
+                                speakers: updatedSpeakers,
+                              }));
+                            }}
                             placeholder="Speaker-Profile"
                             aria-label="Speaker-Profile"
                             aria-describedby="Speaker-Profile"
@@ -339,6 +481,17 @@ function AddEvent() {
                             id="speaker-designation"
                             name="speaker-designation"
                             className="mr-2 mx-auto h-10 w-full max-w-full rounded-lg pl-5 outline outline-2 outline-offset-1 outline-blue-400 placeholder:font-sans placeholder:text-base placeholder:text-gray-500 focus:outline-4"
+                            onBlur={(e) => {
+                              const updatedSpeakers = [
+                                ...speakerDetails.speakers,
+                              ];
+                              updatedSpeakers[index].designation =
+                                e.target.value;
+                              setSpeakerDetails((prevSpeakers) => ({
+                                ...prevSpeakers,
+                                speakers: updatedSpeakers,
+                              }));
+                            }}
                             placeholder="Speaker Designation"
                             aria-label="Speaker Designation"
                             aria-describedby="Speaker Designation"
@@ -348,6 +501,19 @@ function AddEvent() {
                             id="speaker-twitter"
                             name="speaker-twitter"
                             className="mr-2 mx-auto h-10 w-full max-w-full rounded-lg pl-5 outline outline-2 outline-offset-1 outline-blue-400 placeholder:font-sans placeholder:text-base placeholder:text-gray-500 focus:outline-4"
+                            onBlur={(e) => {
+                              const updatedSpeakers = [
+                                ...speakerDetails.speakers,
+                              ];
+                              updatedSpeakers[index].socials.push({
+                                name: 'twitter',
+                                link: e.target.value,
+                              });
+                              setSpeakerDetails((prevSpeakers) => ({
+                                ...prevSpeakers,
+                                speakers: updatedSpeakers,
+                              }));
+                            }}
                             placeholder="Twitter"
                             aria-label="Twitter"
                             aria-describedby="Twitter"
@@ -357,6 +523,19 @@ function AddEvent() {
                             id="speaker-linkedIn"
                             name="speaker-linkedIn"
                             className="mr-2 mx-auto h-10 w-full max-w-full rounded-lg pl-5 outline outline-2 outline-offset-1 outline-blue-400 placeholder:font-sans placeholder:text-base placeholder:text-gray-500 focus:outline-4"
+                            onBlur={(e) => {
+                              const updatedSpeakers = [
+                                ...speakerDetails.speakers,
+                              ];
+                              updatedSpeakers[index].socials.push({
+                                name: 'linkedIn',
+                                link: e.target.value,
+                              });
+                              setSpeakerDetails((prevSpeakers) => ({
+                                ...prevSpeakers,
+                                speakers: updatedSpeakers,
+                              }));
+                            }}
                             placeholder="LinkedIn"
                             aria-label="LinkedIn"
                             aria-describedby="LinkedIn"
@@ -372,19 +551,19 @@ function AddEvent() {
                     <div className="flex items-stretch">
                       <Button
                         className="mt-6"
-                        onClick={() => handleSponsors('add')}
+                        onClick={(e) => handleSponsorsCount(e, 'add')}
                       >
                         Add Sponser
                       </Button>{' '}
                       <Button
                         className="mt-6"
-                        onClick={() => handleSponsors('remove')}
+                        onClick={(e) => handleSponsorsCount(e, 'remove')}
                       >
                         Delete Sponser
                       </Button>
                     </div>
 
-                    {Array.from({ length: sponsorsCount }).map(
+                    {Array.from({ length: sponsorsDetails.count }).map(
                       (_, index: number) => (
                         <div key={index}>
                           {' '}
@@ -393,6 +572,8 @@ function AddEvent() {
                             id="sponsor-name"
                             name="sponsor-name"
                             className="mr-2 mx-auto h-10 w-full max-w-full rounded-lg pl-5 outline outline-2 outline-offset-1 outline-blue-400 placeholder:font-sans placeholder:text-base placeholder:text-gray-500 focus:outline-4"
+                            onBlur={(e) => handleSponsorsAdd(e.target.value)}
+                            style={{ color: 'black' }}
                             placeholder="Sponsor Name"
                             aria-label="Sponsor Name"
                             aria-describedby="Sponsor Name"
@@ -406,7 +587,9 @@ function AddEvent() {
             </React.Fragment>
           ))}
         </div>
-        <Button className="mt-6">Add Event</Button>
+        <Button type="submit" className="mt-6">
+          Add Event
+        </Button>
       </form>
     </section>
   );

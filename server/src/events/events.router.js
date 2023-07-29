@@ -91,9 +91,11 @@ eventRouter.post(
         });
       }
       const data = req.body;
+      // console.log("data: ",data)
       const events = await EventService.createEvent(data);
       res.status(200).send({ success: true, events: events });
     } catch (error) {
+      // console.log(error)
       res
         .status(500)
         .json({ success: false, message: 'Internal server error' });
