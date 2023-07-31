@@ -218,7 +218,11 @@ const slugSchema = {
     },
   },
 };
-
+// body("age", "Invalid age")
+//     .optional({ values: "falsy" })
+//     .isISO8601()
+//     .toDate(),
+//   // …
 const createSchema = {
   name: {
     in: ['body'],
@@ -241,7 +245,7 @@ const createSchema = {
       errorMessage: 'address cannot be empty',
     },
   },
-  'address.isOnline': {
+  'address.*.isOnline': {
     in: ['body'],
     isBoolean: {
       errorMessage: 'Invalid value for isOnline',
@@ -250,7 +254,7 @@ const createSchema = {
       errorMessage: 'isOnline cannot be empty',
     },
   },
-  'address.location': {
+  'address.*.location': {
     in: ['body'],
     isString: {
       errorMessage: 'Invalid location value',
@@ -259,23 +263,26 @@ const createSchema = {
       errorMessage: 'location cannot be empty',
     },
   },
-  image: {
-    in: ['body'],
-    // custom: {
-    //   options: (value) => {
-    //     if (!/\.(png|jpg|jpeg)$/.test(value)) {
-    //       throw new Error('Image must have a valid extension png, jpg, jpeg');
-    //     }
-    //     return true;
-    //   },
-    // },
-    isURL: {
-      errorMessage: 'Invalid URL',
-    },
-    notEmpty: {
-      errorMessage: 'image cannot be empty',
-    },
-  },
+  // image: {
+  //   in: ['body'],
+  //   // custom: {
+  //   //   options: (value) => {
+  //   //     if (!/\.(png|jpg|jpeg)$/.test(value)) {
+  //   //       throw new Error('Image must have a valid extension png, jpg, jpeg');
+  //   //     }
+  //   //     return true;
+  //   //   },
+  //   // },
+  //   isString: {
+  //     errorMessage: 'Invalid image',
+  //   },
+  //   // isURL: {
+  //   //   errorMessage: 'Invalid URL',
+  //   // },
+  //   notEmpty: {
+  //     errorMessage: 'image cannot be empty',
+  //   },
+  // },
   date: {
     in: ['body'],
     isDate: {
@@ -296,14 +303,36 @@ const createSchema = {
   },
   tags: {
     in: ['body'],
-    isArray: {
-      errorMessage: 'Tags must be an array',
-      options: { min: 1 },
-    },
-    notEmpty: {
-      errorMessage: 'Tags array must not be empty',
+    custom: {
+      options: (value) => {
+        // console.log("console.log",value,Array.isArray(JSON.parse(value)))
+        if (Array.isArray(value)) {
+          // console.log("oh yessss array")
+          // throw new Error('Invalid email format');
+        }
+        return true;
+      },
+      // isArray: true, notEmpty: true
+      // isArray: {
+      //   errorMessage: 'Tags must be an array',
+      //   options: { min: 1 },
+      // },
+      notEmpty: {
+        errorMessage: 'Tags array must not be empty',
+      },
     },
   },
+  // tags: {
+  //   in: ['body'],
+  //   // isArray: true, notEmpty: true
+  //   isArray: {
+  //     errorMessage: 'Tags must be an array',
+  //     options: { min: 1 },
+  //   },
+  //   notEmpty: {
+  //     errorMessage: 'Tags array must not be empty',
+  //   },
+  // },
 };
 
 const deleteSchema = {

@@ -46,7 +46,7 @@ const createEvent = async (eventInfo) => {
     const createdEvent = new EventModel(eventInfo);
 
     await createdEvent?.save();
-
+    // console.log(createEvent)
     return createdEvent;
   } catch (error) {
     throw new Error(error);

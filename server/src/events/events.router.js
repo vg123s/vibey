@@ -1,6 +1,7 @@
 import { validationSchema } from '../validator-schema/validationSchema.js';
 import { EventService } from './event.service.js';
 import express from 'express';
+// import { check,body,checkSchema, validationResult } from 'express-validator';
 import { checkSchema, validationResult } from 'express-validator';
 
 export const eventRouter = express.Router();
@@ -81,17 +82,33 @@ eventRouter.get(
 //add event
 eventRouter.post(
   '/create',
-  checkSchema(validationSchema.createSchema),
+  // check('tags').isArray({ min: 1 }).withMessage("tags is not array"),
+  // checkSchema(validationSchema.createSchema),
+  // validation,
   async (req, res) => {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(422).json({
-          errors: errors.array(),
-        });
-      }
-      const data = req.body;
-      // console.log("data: ",data)
+      // const errors = validationResult(req);
+      // if (!errors.isEmpty()) {
+      //   return res.status(422).json({
+      //     errors: errors.array(),
+      //   });
+      // }
+      // const data = req;
+      // console.log("data: ",req.body)
+      let data = {};
+      data.name = req.body.name;
+      data.organizer = req.body.organizer;
+      data.description = req.body.description;
+      data.address = JSON.parse(req.body.address);
+      data.date = new Date(req.body.date);
+      data.duration = parseInt(req.body.duration);
+      data.tags = JSON.parse(req.body.tags);
+      data.link = req.body.link;
+      // data.image = req.body.image
+      data.logo = req.body.logo;
+      data.speakers = JSON.parse(req.body.speakers);
+      data.requiresTicket = req.body.requiresTicket;
+      data.sponsors = JSON.parse(req.body.sponsors);
       const events = await EventService.createEvent(data);
       res.status(200).send({ success: true, events: events });
     } catch (error) {
